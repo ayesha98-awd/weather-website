@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Live Weather App</title>
+  <style>
+    body {
+      background: linear-gradient(to right, #83a4d4, #b6fbff);
+      font-family: Arial, sans-serif;
+      color: #fff;
+      text-align: center;
+      padding: 50px;
+    }
+
+    .container {
+      background-color: rgba(0, 0, 0, 0.4);
+      padding: 30px;
+      border-radius: 20px;
+      max-width: 400px;
+      margin: auto;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    }
+
+    input {
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      width: 80%;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: #ff9800;
+      padding: 10px 20px;
+      border: none;
+      color: white;
+      border-radius: 10px;
+      margin-top: 10px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #e68a00;
+    }
+
+    img {
+      width: 80px;
+      margin: 10px 0;
+    }
+
+    .info {
+      font-size: 18px;
+      margin: 8px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Weather App 🌦️</h2>
+    <input type="text" id="cityInput" placeholder="Enter City (e.g. Colombo)" />
+    <br>
+    <button onclick="getWeather()">Check Weather</button>
+
+    <div id="weatherData" style="margin-top: 20px;">
+      <!-- Weather info will appear here -->
+    </div>
+  </div>
+
+  <script>
+    async function getWeather() {
+      const city = document.getElementById('cityInput').value;
+      const apiKey = '54253eb8cb3e42ee318141d8d85e403f';
+      const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.cod === '404') {
+          document.getElementById('weatherData').innerHTML = `<p style="color: yellow;">City not found. Try again!</p>`;
+          return;
+        }
+
+        const weatherIcon = `http://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
+
+        // 🕒 Local time calculation
+        const timezoneOffset = data.timezone; // in seconds
+        const localDate = new Date(new Date().getTime() + (timezoneOffset * 1000));
+        const localTime = localDate.toUTCString().replace('GMT', '');
+
+        const weatherHTML = `
+          <img src="${weatherIcon}" alt="Weather Icon">
+          <div class="info"><strong>Country:</strong> ${data.sys.country}</div>
+          <div class="info"><strong>Temperature:</strong> ${data.main.temp} °C</div>
+          <div class="info"><strong>Weather:</strong> ${data.weather[0].main}</div>
+          <div class="info"><strong>Wind Speed:</strong> ${data.wind.speed} m/s</div>
+          <div class="info"><strong>Local Time:</strong> ${localTime}</div>
+        `;
+
+        document.getElementById('weatherData').innerHTML = weatherHTML;
+
+      } catch (error) {
+        document.getElementById('weatherData').innerHTML = `<p style="color: yellow;">Error fetching data. Please try again.</p>`;
+      }
+    }
+  </script>
+</body>
+</html>
