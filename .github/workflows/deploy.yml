@@ -2,10 +2,13 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main  # or 'master'
+      - main
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     permissions:
       contents: read
       pages: write
